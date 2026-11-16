@@ -1,0 +1,23 @@
+#!/bin/sh
+# Template: lazy loader for a raw payload stored on a USB partition.
+# Install as /usr/sbin/oc-load. Adjust T, DEVICE, BLOCKS and the binary name.
+T=/tmp/opt
+DEVICE=/dev/sda3
+BLOCKS=396
+
+[ -x "$T/usr/sbin/openconnect" ] && exit 0
+[ -b "$DEVICE" ] || { echo "oc-load: $DEVICE missing (usb-storage module?)"; exit 1; }
+
+rm -rf /tmp/oc.tmp
+mkdir -p /tmp/oc.tmp
+if ! dd if="$DEVICE" bs=4096 count="$BLOCKS" 2>/dev/null | gunzip -c | tar xf - -C /tmp/oc.tmp; then
+    echo "oc-load: extract failed (payload damaged on USB?)"
+    rm -rf /tmp/oc.tmp
+    exit 1
+fi
+chmod 755 /tmp/oc.tmp/usr/sbin/openconnect /tmp/oc.tmp/usr/bin/resolveip \
+          /tmp/oc.tmp/etc/vpnc-script 2>/dev/null
+
+rm -rf "$T"
+mv /tmp/oc.tmp "$T" || exit 1
+exit 0

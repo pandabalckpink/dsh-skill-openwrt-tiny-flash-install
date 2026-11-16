@@ -1,0 +1,23 @@
+#!/bin/sh
+# Template: wrapper that runs a RAM-extracted openconnect with sane defaults.
+# Install as /usr/bin/oc.  Usage: oc [openconnect options] <server>
+[ -x /tmp/opt/usr/sbin/openconnect ] || /usr/sbin/oc-load || exit 1
+
+mkdir -p /dev/net
+[ -c /dev/net/tun ] || mknod /dev/net/tun c 10 200
+grep -q '^tun ' /proc/modules || insmod /tmp/opt/lib/modules/4.4.182/tun.ko 2>/dev/null
+
+export LD_LIBRARY_PATH=/tmp/opt/usr/lib
+export PATH=/tmp/opt/usr/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+# Default CA bundle shipped inside the payload; a user-supplied --cafile wins.
+case " $* " in
+  *" --cafile "*|*" --cafile="*|*" --capath "*|*" --capath="*)
+    ;;
+  *)
+    set -- --cafile /tmp/opt/etc/ssl/ca-certificates.crt "$@"
+    ;;
+esac
+
+# -s overrides the netifd-only /lib/netifd/vpnc-script, which cannot run standalone.
+exec /tmp/opt/usr/sbin/openconnect -s /tmp/opt/etc/vpnc-script "$@"
