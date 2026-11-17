@@ -1,6 +1,30 @@
 ---
+
 name: openwrt-tiny-flash-install
 description: Install or run software on an OpenWrt/LEDE router whose flash is nearly full, by keeping only kernel modules in flash and running the application from a payload stored raw on USB and extracted into tmpfs. Covers openconnect/AnyConnect client setup, CA bundle, clock and vpnc-script pitfalls.
+summary: "Fit a VPN client onto a 4 MB OpenWrt router: measure the real overlay ceiling, install only kernel modules in flash, keep the application as a raw gzip tar on USB, and extract it into tmpfs at run time."
+version: 1.0.0
+tags:
+  - openwrt
+  - router
+  - embedded
+  - openconnect
+  - vpn
+  - tiny-flash
+  - tmpfs
+  - usb
+keywords:
+  - opkg no space left on device
+  - overlay full
+  - 4MB router
+  - openconnect on openwrt
+  - usb payload without filesystem
+  - tmpfs memory budget
+use_cases:
+  - An OpenWrt/LEDE router with 4-8 MB flash rejects opkg install with "No space left on device"
+  - You need an OpenConnect or AnyConnect client on a router whose flash cannot hold it
+  - TLS fails on the router because the clock resets at boot and there is no CA bundle
+docs_url: https://github.com/pandabalckpink/dsh-skill-openwrt-tiny-flash-install
 ---
 
 # Fitting software onto a 4 MB router
